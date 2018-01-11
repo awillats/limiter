@@ -23,14 +23,14 @@
 
 #include <default_gui_model.h>
 
-class PluginTemplate : public DefaultGUIModel
+class Limiter : public DefaultGUIModel
 {
 
   Q_OBJECT
 
 public:
-  PluginTemplate(void);
-  virtual ~PluginTemplate(void);
+  Limiter(void);
+  virtual ~Limiter(void);
 
   void execute(void);
   void createGUI(DefaultGUIModel::variable_t*, int);
@@ -43,6 +43,9 @@ private:
   double some_parameter;
   double some_state;
   double period;
+
+  double lower_lim;
+  double upper_lim;
 
   void initParameters();
 

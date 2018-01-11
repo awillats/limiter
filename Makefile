@@ -1,9 +1,9 @@
-PLUGIN_NAME = plugin_template
+PLUGIN_NAME = limiter
 
-HEADERS = plugin-template.h
+HEADERS = limiter.h
 
-SOURCES = plugin-template.cpp\
-          moc_plugin-template.cpp\
+SOURCES = limiter.cpp\
+          moc_limiter.cpp\
 
 LIBS = 
 

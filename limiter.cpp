@@ -21,32 +21,42 @@
  * DefaultGUIModel with a custom GUI.
  */
 
-#include "plugin-template.h"
+#include "limiter.h"
 #include <iostream>
 #include <main_window.h>
 
 extern "C" Plugin::Object*
 createRTXIPlugin(void)
 {
-  return new PluginTemplate();
+  return new Limiter();
 }
 
 static DefaultGUIModel::variable_t vars[] = {
   {
-    "GUI label", "Tooltip description",
+    "Upper Limit", "",
     DefaultGUIModel::PARAMETER | DefaultGUIModel::DOUBLE,
   },
   {
-    "A State", "Tooltip description", DefaultGUIModel::STATE,
+    "Lower Limit", "",
+    DefaultGUIModel::PARAMETER | DefaultGUIModel::DOUBLE,
   },
+  {
+    "x-in", "",
+    DefaultGUIModel::INPUT,
+  },
+  {
+    "x-out", "",
+    DefaultGUIModel::OUTPUT,
+  },
+
 };
 
 static size_t num_vars = sizeof(vars) / sizeof(DefaultGUIModel::variable_t);
 
-PluginTemplate::PluginTemplate(void)
-  : DefaultGUIModel("PluginTemplate with Custom GUI", ::vars, ::num_vars)
+Limiter::Limiter(void)
+  : DefaultGUIModel("Limiter with Custom GUI", ::vars, ::num_vars)
 {
-  setWhatsThis("<p><b>PluginTemplate:</b><br>QWhatsThis description.</p>");
+  setWhatsThis("<p><b>Limiter:</b><br>QWhatsThis description.</p>");
   DefaultGUIModel::createGUI(vars,
                              num_vars); // this is required to create the GUI
   customizeGUI();
@@ -58,35 +68,45 @@ PluginTemplate::PluginTemplate(void)
   QTimer::singleShot(0, this, SLOT(resizeMe()));
 }
 
-PluginTemplate::~PluginTemplate(void)
+Limiter::~Limiter(void)
 {
 }
 
 void
-PluginTemplate::execute(void)
+Limiter::execute(void)
 {
+  double x = input(0);
+  if (x>upper_lim){	x=upper_lim;  }
+  if (x<lower_lim){	x=lower_lim; }
+  output(0) = x;
+
   return;
 }
 
 void
-PluginTemplate::initParameters(void)
+Limiter::initParameters(void)
 {
   some_parameter = 0;
   some_state = 0;
+  upper_lim = 5;
+  lower_lim = 0;
 }
 
 void
-PluginTemplate::update(DefaultGUIModel::update_flags_t flag)
+Limiter::update(DefaultGUIModel::update_flags_t flag)
 {
   switch (flag) {
     case INIT:
       period = RT::System::getInstance()->getPeriod() * 1e-6; // ms
-      setParameter("GUI label", some_parameter);
-      setState("A State", some_state);
+      setParameter("Upper Limit", upper_lim);
+      setParameter("Lower Limit", lower_lim);
       break;
 
     case MODIFY:
       some_parameter = getParameter("GUI label").toDouble();
+	  upper_lim = getParameter("Upper Limit").toDouble();
+	  lower_lim = getParameter("Lower Limit").toDouble();
+
       break;
 
     case UNPAUSE:
@@ -105,7 +125,7 @@ PluginTemplate::update(DefaultGUIModel::update_flags_t flag)
 }
 
 void
-PluginTemplate::customizeGUI(void)
+Limiter::customizeGUI(void)
 {
   QGridLayout* customlayout = DefaultGUIModel::getLayout();
 
@@ -126,11 +146,11 @@ PluginTemplate::customizeGUI(void)
 
 // functions designated as Qt slots are implemented as regular C++ functions
 void
-PluginTemplate::aBttn_event(void)
+Limiter::aBttn_event(void)
 {
 }
 
 void
-PluginTemplate::bBttn_event(void)
+Limiter::bBttn_event(void)
 {
 }
